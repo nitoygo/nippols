@@ -1,0 +1,23 @@
+{
+  "name": "client-app",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "moment": "^2.22.1",
+    "react": "^16.4.1",
+    "react-admin": "^2.1.4",
+    "react-big-calendar": "^0.19.2",
+    "react-calendar": "^2.16.1",
+    "react-dom": "^16.4.1",
+    "react-markdown": "^3.3.0",
+    "react-scripts": "1.1.4",
+    "react-text-mask": "^5.4.2",
+    "recharts": "^1.1.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
