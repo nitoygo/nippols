@@ -91,7 +91,8 @@ class WeeklyContainer extends React.Component {
       tasks: [],
       taskMinutes: [],
       saving: false,
-      addTaskOpen: false
+      taskOthers: [],
+      taskAddOpen: false
     };
   }
 
@@ -148,8 +149,38 @@ class WeeklyContainer extends React.Component {
     });
   }
 
+  onTaskOthersReceived = (taskOthers) => {
+    // remove those already in tasks[]
+    for (let othersIdx = taskOthers.length - 1; othersIdx > 0; othersIdx--) {
+      let found = false;
+  
+      for (let tempIdx = 0; tempIdx < this.state.tasks.length; tempIdx++) {
+  
+        let othersEntry = taskOthers[othersIdx];
+        let tasksEntry = this.state.tasks[tempIdx];
+  
+        if (othersEntry.id === tasksEntry.id) {
+          found = true;
+          break;
+        }
+      }
+  
+      // if in intersection, remove in existing array
+      if (found) {
+        taskOthers.splice(othersIdx, 1);
+      }
+    }
+
+    taskOthers = taskOthers.map(task => ({
+      value: task.id,
+      label: task.name,
+    }));
+    this.setState({taskOthers});
+  }
+
   onUpdateTasksStateCompleted = () => {
-    
+    CustomRequests.getTasksToAddForTimesheet(this.state.weekDates[6],
+      taskOthers => this.onTaskOthersReceived(taskOthers));
   }
 
   updateTasksState = (tasks) => {
@@ -260,11 +291,11 @@ class WeeklyContainer extends React.Component {
   }
 
   onClickAddTask = () => {
-    this.setState({addTaskOpen: true});
+    this.setState({taskAddOpen: true});
   }
 
   onAddTaskDialogExit = () => {
-    this.setState({addTaskOpen: false});
+    this.setState({taskAddOpen: false});
   }
 
   render() {
@@ -394,7 +425,7 @@ class WeeklyContainer extends React.Component {
         </div>
         <Divider />
         <WeekToolbar saving={this.state.saving} onClickSave={this.onClickSave} onClickAddTask={this.onClickAddTask}  />
-        <AddTaskDialog open={this.state.addTaskOpen} onDialogExit={this.onAddTaskDialogExit} />
+        <AddTaskDialog open={this.state.taskAddOpen} onDialogExit={this.onAddTaskDialogExit} taskOptions={this.state.taskOthers}/>
       </div>
     );
   }

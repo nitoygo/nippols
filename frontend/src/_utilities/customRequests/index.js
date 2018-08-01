@@ -33,25 +33,11 @@ class CustomRequests {
    * this is used for generating summary or for getting manhour records of past weeks
    */
   static getTasksForSpecificDates(startDate, endDate, resolve) {
-    let timeRange = endDate.getTime();
-
-    restClient()
-      .then(dataProvider => {
-        dataProvider(GET_LIST, 'task', {
-            filter: {
-              openedBefore: timeRange,
-              notClosedUntil: timeRange
-            }
-        })
-      .then(response => {
-        if(resolve) {
-          resolve(response.data);
-        }
-      });
-    });
+    let data = []
+    resolve(data);
   }
 
-  static getTasksForAddToTimesheet(date, resolve) {
+  static getTasksToAddForTimesheet(date, resolve) {
     let timeRange = date.getTime();
 
     restClient()
