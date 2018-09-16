@@ -45,7 +45,8 @@ class CustomRequests {
         dataProvider(GET_LIST, 'task', {
             filter: {
               openedBefore: timeRange,
-              notClosedUntil: timeRange
+              notClosedUntil: timeRange,
+              // TODO: add projects of current user as filter
             }
         })
       .then(response => {

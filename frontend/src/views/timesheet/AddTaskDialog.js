@@ -1,135 +1,24 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import PropTypes from 'prop-types';
-import Select from 'react-select';
-import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import MenuItem from '@material-ui/core/MenuItem';
-
-const styles = theme => ({
-  root: {
-    flexGrow: 1,
-    height: 250,
-  },
-  input: {
-    display: 'flex',
-    padding: 0,
-  },
-  valueContainer: {
-    display: 'flex',
-    flex: 1,
-    alignItems: 'center',
-  },
-  noOptionsMessage: {
-    fontSize: 16,
-    padding: `${theme.spacing.unit}px ${theme.spacing.unit * 2}px`,
-  },
-  singleValue: {
-    fontSize: 16,
-  },
-  placeholder: {
-    position: 'absolute',
-    left: 2,
-    fontSize: 16,
-  },
-});
-
-function NoOptionsMessage(props) {
-  return (
-    <Typography
-      color="textSecondary"
-      className={props.selectProps.classes.noOptionsMessage}
-      {...props.innerProps}
-    >
-      {props.children}
-    </Typography>
-  );
-}
-
-function inputComponent({ inputRef, ...props }) {
-  return <div ref={inputRef} {...props} />;
-}
-
-function Control(props) {
-  return (
-    <TextField
-      fullWidth
-      InputProps={{
-        inputComponent,
-        inputProps: {
-          className: props.selectProps.classes.input,
-          ref: props.innerRef,
-          children: props.children,
-          ...props.innerProps,
-        },
-      }}
-    />
-  );
-}
-
-function Option(props) {
-  return (
-    <MenuItem
-      buttonRef={props.innerRef}
-      selected={props.isFocused}
-      component="div"
-      style={{
-        fontWeight: props.isSelected ? 500 : 400,
-      }}
-      {...props.innerProps}
-    >
-      {props.children}
-    </MenuItem>
-  );
-}
-
-function Placeholder(props) {
-  return (
-    <Typography
-      color="textSecondary"
-      className={props.selectProps.classes.placeholder}
-      {...props.innerProps}
-    >
-      {props.children}
-    </Typography>
-  );
-}
-
-function SingleValue(props) {
-  return (
-    <Typography className={props.selectProps.classes.singleValue} {...props.innerProps}>
-      {props.children}
-    </Typography>
-  );
-}
-
-function ValueContainer(props) {
-  return <div className={props.selectProps.classes.valueContainer}>{props.children}</div>;
-}
-
-const components = {
-  Option,
-  Control,
-  NoOptionsMessage,
-  Placeholder,
-  SingleValue,
-  ValueContainer,
-};
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Checkbox from '@material-ui/core/Checkbox';
 
 class FormDialog extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      value: -1
+      checked: [0],
     }
+
   }
 
   componentDidMount() {
@@ -140,42 +29,68 @@ class FormDialog extends React.Component {
     this.props.onDialogExit();
   }
 
-  handleChange = (value) => {
+  handleToggle = value => () => {
+    const { checked } = this.state;
+    const currentIndex = checked.indexOf(value);
+    const newChecked = [...checked];
+
+    if (currentIndex === -1) {
+      newChecked.push(value);
+    } else {
+      newChecked.splice(currentIndex, 1);
+    }
+
     this.setState({
-      value: value,
+      checked: newChecked,
     });
-  };
+  }
 
   render() {
-    const {taskOptions, classes} = this.props;
+    const {taskOptions} = this.props;
+    const {classes} = this.props;
 
     return (
       <Dialog
         open={this.props.open}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle id="form-dialog-title">Add Task</DialogTitle>
+        <DialogTitle id="form-dialog-title">Add Tasks</DialogTitle>
         <DialogContent>
           <DialogContentText>
             Search name of task you want to add in this week's timesheet
           </DialogContentText>
-          <div style={{height: '40vh'}}>
-            <Select
-              classes={classes}
-              options={taskOptions}
-              components={components}
-              value={this.state.value}
-              onChange={this.handleChange}
-              placeholder="Search for a task"
-            />
-          </div>
+          <List>
+            {
+              taskOptions.map((task, index) => {
+                return (
+                  <ListItem
+                    key={index}
+                    button
+                    dense
+                    onClick={this.handleToggle(task)}
+                  >
+                    <Checkbox
+                      checked={this.state.checked.indexOf(task) !== -1}
+                      tabIndex={-1}
+                      disableRipple
+                    />
+                    <ListItemText 
+                      primary={`${task.name}`}
+                      secondary={`${task.projectScope}`}
+                    />
+                  </ListItem>
+                )
+              })
+            }
+          </List>
+
         </DialogContent>
         <DialogActions>
           <Button onClick={this.handleClose} color="primary">
             Cancel
           </Button>
           <Button onClick={this.handleClose} color="primary">
-            Add Task
+            Add Tasks
           </Button>
         </DialogActions>
       </Dialog>
@@ -183,9 +98,4 @@ class FormDialog extends React.Component {
   }
 }
 
-
-FormDialog.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
-
-export default withStyles(styles)(FormDialog);
+export default FormDialog;

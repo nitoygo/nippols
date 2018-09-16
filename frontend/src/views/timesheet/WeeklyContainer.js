@@ -82,10 +82,10 @@ class WeeklyContainer extends React.Component {
 
     let baseWeekDates = this.getWeekDates(baseDate);
 
-    this.dateToday = baseDate;
     this.taskMinutes = [];
 
     this.state = {
+      dateToday: baseDate,
       date: baseDate,
       weekDates: baseWeekDates,
       tasks: [],
@@ -104,30 +104,14 @@ class WeeklyContainer extends React.Component {
     this.taskMinutes.splice(0, this.taskMinutes.length);
   }
 
-  isThisWeek = (dateToCheck) => {
-    // check if same year
-    if (dateToCheck.getFullYear() !== this.dateToday.getFullYear()) {
-      return false;
+  isSameWeekAsToday = () => {
+    for(let i = 0; i < this.state.weekDates.length; i++) {
+      if (this.state.dateToday.getTime() === this.state.weekDates[i].getTime()) {
+        return true;
+      }
     }
 
-    // check if same month
-    if (dateToCheck.getMonth() !== this.dateToday.getMonth()) {
-      return false;
-    }
-
-    // get relative mondays
-    let tempDay = dateToCheck.getDay() - 1 < 0 ? 6: dateToCheck.getDay() - 1;
-    let tempMondayDate = dateToCheck.getDate() - (tempDay);
-
-    let thisDay = this.dateToday.getDay() - 1 < 0 ? 6: this.dateToday.getDay() - 1;
-    let thisMondayDate = this.dateToday.getDate() - (thisDay);
-
-    // check if same mondays
-    if (tempMondayDate !== thisMondayDate) {
-      return false;
-    }
-
-    return true;
+    return false;
   }
 
   onUpdateTaskMinutesStateCompleted = () => {
@@ -171,14 +155,11 @@ class WeeklyContainer extends React.Component {
       }
     }
 
-    taskOthers = taskOthers.map(task => ({
-      value: task.id,
-      label: task.name,
-    }));
     this.setState({taskOthers});
   }
 
   onUpdateTasksStateCompleted = () => {
+    // TODO: maybe move this on dialog window show
     CustomRequests.getTasksToAddForTimesheet(this.state.weekDates[6],
       taskOthers => this.onTaskOthersReceived(taskOthers));
   }
@@ -209,7 +190,7 @@ class WeeklyContainer extends React.Component {
           }
         );
       });
-    } 
+    }
     else {
       this.updateTaskMinutesState([]);
       this.updateTasksState([]);
@@ -217,7 +198,7 @@ class WeeklyContainer extends React.Component {
   }
 
   updateTasksAccdgToDate = () => {
-    if (this.isThisWeek(this.state.date)) {
+    if (this.isSameWeekAsToday()) {
       CustomRequests.getTasksForThisWeek(
         tasks => this.onTasksReceived(tasks)
       );
